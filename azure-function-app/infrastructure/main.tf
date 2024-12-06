@@ -99,6 +99,13 @@ resource "azurerm_role_assignment" "storage_access" {
   principal_id         = azurerm_user_assigned_identity.kv-storage-blob.principal_id
 }
 
+# Assign the Managed Identity Access to Storage Account
+resource "azurerm_role_assignment" "function_app_access" {
+  scope                = azurerm_linux_function_app.this.id
+  role_definition_name = "Reader"
+  principal_id         = azurerm_user_assigned_identity.kv-storage-blob.principal_id
+}
+
 resource "azurerm_service_plan" "this" {
   name                = "btcapi-azurerm-service-plan-${var.name}"
   resource_group_name = azurerm_resource_group.this.name
@@ -123,6 +130,8 @@ resource "azurerm_linux_function_app" "this" {
     # WEBSITES_MOUNT_ENABLED              = 1
     # FUNCTIONS_WORKER_RUNTIME            = "python"
     # AzureWebJobsStorage                 = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.this.name};AccountKey=${azurerm_storage_account.this.primary_access_key}"
+    # Reference Key Vault secret
+    "MySecretSetting" = "@Microsoft.KeyVault(SecretUri=https://${azurerm_key_vault.this.name}.vault.azure.net/secrets/StorageAccountKey/)"
   }
   site_config {
     application_stack {
