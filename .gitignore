@@ -1,0 +1,13 @@
+**/.DS_Store
+*/.DS_Store
+.DS_Store
+.terraform/*
+terraform.tfstate
+key.ppk
+.terraform.lock.hcl
+**/.terraform
+**/output-windows/*
+**/packer_cache/*
+Ansible/k8s/github-actions-runner/ib_ssh
+**/venv/*
+**/*.pyc

@@ -1,0 +1,37 @@
+version: '3'
+
+env:
+  ENV: testing   # default value
+  VARFILE: enva  # default value
+
+tasks:
+  clean:
+    cmds:
+      - rm -rf .terraform
+      - rm -rf .terraform.lock.hcl
+  init:
+    dotenv: ['.env.{{.ENV}}']
+    cmds:
+      - tfenv install 1.8.2
+      - tfenv use 1.8.2
+      - terraform init --backend-config="key={{.VARFILE}}.state" --backend-config="resource_group_name=$BACKEND_RG_NAME" --backend-config="storage_account_name=$BACKEND_SA_NAME" --backend-config="container_name=$BACKEND_CONTAINER_NAME"
+  plan:
+    dotenv: ['.env.{{.ENV}}']
+    cmds:
+      - terraform plan -var-file="./envs/{{.VARFILE}}.tfvars"
+  apply:
+    dotenv: ['.env.{{.ENV}}']
+    cmds:
+      - terraform apply -var-file="./envs/{{.VARFILE}}.tfvars"
+  apply-approve:
+    dotenv: ['.env.{{.ENV}}']
+    cmds:
+      - terraform apply -auto-approve -var-file="./envs/{{.VARFILE}}.tfvars"      
+  destroy:
+    dotenv: ['.env.{{.ENV}}']
+    cmds:
+      - terraform destroy -var-file="./envs/{{.VARFILE}}.tfvars"
+  sensitive-output:
+    dotenv: ['.env.{{.ENV}}']
+    cmds:
+      - echo "export STORAGE_ACCOUNT_NAME=$(terraform output -raw storage_account_name); export STORAGE_ACCOUNT_KEY=$(terraform output -raw storage_account_key)"
